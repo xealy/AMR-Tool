@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/index.css?nocache={timestamp}" type="text/css">
+{% endblock %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+<section>
+    <div class="container border border-dark">
+        <div class="row">
+                <div class="col-2"></div>
+                <div class="col-8 bg-light text-center">
+                    <p class="display-4 pt-2">Automated Meter Reader</p>
+                    <p class="pt-2">This AMR tool will read the digits of water meter images.</p>
+                    <p class="">Upload your batch of counter-based water meter images:</p>
+                    <div class="row mb-3">
+                      <div class="col-3"></div>
+                      <div class="col-6">
+
+                        <form method="POST" enctype="multipart/form-data">
+                          <input class="form-control pb-5 pt-3" type="file" id="formFileMultiple" name="files" multiple>
+                          <button type="submit" class="btn btn-primary mt-3">Process meter images</button>
+                        </form>
+
+                      </div>
+                      <div class="col-3"></div>
+                    </div>
+                </div>
+                <div class="col-2"></div>
+        </div>
+    </div>
+</section>
+{% endblock %}
