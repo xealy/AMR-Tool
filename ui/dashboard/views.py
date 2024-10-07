@@ -20,7 +20,7 @@ def index():
         
         files = request.files.getlist('files')
     
-        # generate a timestamped folder name
+        # generate timestamped folder names
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         input_folder = f'images/inputs/input_{timestamp}'
         interim_folder = f'images/interim/interim_{timestamp}'
@@ -38,23 +38,21 @@ def index():
         if not os.path.exists(output_folder):
             os.makedirs(output_folder)
         
+        # iterate through files received from POST request
         for file in files:
             if file.filename == '':
                 print('No selected file')
                 return redirect(request.url)
-            
-            # save file to designated folder
-            file.save(os.path.join(input_folder, file.filename))
-        
-        print('Files successfully uploaded')
+            file.save(os.path.join(input_folder, file.filename)) # save file to designated folder
 
         # RAD MODULE
         rad_model = YOLO("C:/EGH400-UI/ui/models/rad_model.pt")
         results = rad_model.predict(source=f"C:/EGH400-UI/ui/{input_folder}", show=True)
-        bounding_boxes = {}
+        bounding_boxes = {} # create bounding boxes dictionary (to crop RAD images)
         for idx, result in enumerate(results):
+            # save predicted RAD image to interim folder
             result.save(filename=f"C:/EGH400-UI/ui/{interim_folder}/result_{idx}.jpg")
-
+            # update bounding boxes dictionary
             key = f'result_{idx}.jpg'
             bbox_array = result.boxes.xyxy.cpu().numpy()
             bbox_array_1d = bbox_array.flatten()
@@ -66,12 +64,10 @@ def index():
             if filename.endswith(".jpg"):
                 image_path = os.path.join(f"C:/EGH400-UI/ui/{interim_folder}", filename)
                 image = Image.open(image_path)
-
                 if filename in bounding_boxes:
                     bbox = bounding_boxes[filename]
-                    cropped_image = image.crop((bbox[0], bbox[1], bbox[2], bbox[3])) # Crop the image using the bounding box coordinates
-
-                    output_path = os.path.join(f"C:/EGH400-UI/ui/{cropped_folder}", filename) # Save the cropped image to the output folder
+                    cropped_image = image.crop((bbox[0], bbox[1], bbox[2], bbox[3])) # crop image using the bounding box coordinates
+                    output_path = os.path.join(f"C:/EGH400-UI/ui/{cropped_folder}", filename) # save cropped image to cropped folder
                     cropped_image.save(output_path)
                     print(f"Cropped image saved to {cropped_folder}")
                 else:
@@ -83,16 +79,13 @@ def index():
         output_text_file = f"C:/EGH400-UI/ui/{output_folder}/amr_readings.txt"
         for idx, result in enumerate(results):
             image_name = f"result_{idx}.jpg"
+            # save predicted CR image to output folder
             result.save(filename=f"C:/EGH400-UI/ui/{output_folder}/{image_name}")
-
-            # OUTPUT READINGS TO TEXT ??
+            # output AMR readings to text file
             sorted_indices = sorted(range(len(result.boxes.xyxy)), key=lambda i: result.boxes.xyxy[i][0])
             sorted_class_predictions = [result.boxes.cls[i] for i in sorted_indices]
             sorted_class_predictions_list = [int(tensor.item()) for tensor in sorted_class_predictions]
             amr_reading_string = ''.join([str(num) for num in sorted_class_predictions_list])
-
-            print("Sorted class predictions (MSD to LSD):", amr_reading_string)
-
             with open(output_text_file, 'a') as file:
                 file.write(f"{image_name}: {amr_reading_string}\n")
 
