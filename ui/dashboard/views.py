@@ -4,6 +4,7 @@ from datetime import datetime
 import shutil
 from ultralytics import YOLO
 from PIL import Image
+import csv
 
 
 bp = Blueprint('main', __name__)
@@ -77,22 +78,36 @@ def index():
         # CR MODULE
         cr_model = YOLO("C:/EGH400-UI/ui/models/cr_model.pt")
         results = cr_model.predict(source=f"C:/EGH400-UI/ui/{cropped_folder}", show=True)
-        output_text_file = f"C:/EGH400-UI/ui/{output_folder}/amr_readings.txt"
-        for idx, result in enumerate(results):
-            image_name = f"result_{idx}.jpg"
-            # save predicted CR image to output folder
-            result.save(filename=f"C:/EGH400-UI/ui/{output_folder}/{image_name}")
 
-            # output AMR readings to text file
-            sorted_indices = sorted(range(len(result.boxes.xyxy)), key=lambda i: result.boxes.xyxy[i][0])
-            sorted_class_predictions = [result.boxes.cls[i] for i in sorted_indices]
-            sorted_class_predictions_list = [int(tensor.item()) for tensor in sorted_class_predictions]
-            amr_reading_string = ''.join([str(num) for num in sorted_class_predictions_list])
-            amr_reading_string = amr_reading_string[:5] + '.' + amr_reading_string[5:]
-            amr_reading_string = amr_reading_string + 'kL'
+        output_csv_file = f"C:/EGH400-UI/ui/{output_folder}/amr_readings.csv"
+        fieldnames = ['image_name', 'predicted_amr_reading']
 
-            with open(output_text_file, 'a') as file:
-                file.write(f"{image_name}: {amr_reading_string}\n")
+        # Check if the CSV file exists
+        file_exists = os.path.isfile(output_csv_file)
+
+        # Open the CSV file in append mode
+        with open(output_csv_file, 'a', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            # Write the header only if the file is new
+            if not file_exists:
+                writer.writeheader()
+
+            for idx, result in enumerate(results):
+                image_name = f"result_{idx}.jpg"
+                # Save predicted CR image to output folder
+                result.save(filename=f"C:/EGH400-UI/ui/{output_folder}/{image_name}")
+
+                # Output AMR readings to CSV file
+                sorted_indices = sorted(range(len(result.boxes.xyxy)), key=lambda i: result.boxes.xyxy[i][0])
+                sorted_class_predictions = [result.boxes.cls[i] for i in sorted_indices]
+                sorted_class_predictions_list = [int(tensor.item()) for tensor in sorted_class_predictions]
+                predicted_amr_reading_string = ''.join([str(num) for num in sorted_class_predictions_list])
+                predicted_amr_reading_string = predicted_amr_reading_string[:5] + '.' + predicted_amr_reading_string[5:]
+                predicted_amr_reading_string = predicted_amr_reading_string + 'kL'
+
+                # Write the row to the CSV file
+                writer.writerow({'image_name': image_name, 'predicted_amr_reading': predicted_amr_reading_string})
 
         # compress the output folder into a ZIP file
         zip_filename = f"{output_zips_folder}.zip"
