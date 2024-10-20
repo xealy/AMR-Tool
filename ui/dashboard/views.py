@@ -52,10 +52,11 @@ def index():
         bounding_boxes = {} # create bounding boxes dictionary (to crop RAD images)
         for idx, result in enumerate(results):
             # save predicted RAD image to interim folder
-            result.save(filename=f"C:/EGH400-UI/ui/{interim_folder}/result_{idx}.jpg")
+            og_filename = os.path.basename(result.path)
+            result.save(filename=f"C:/EGH400-UI/ui/{interim_folder}/{og_filename}")
 
             # update bounding boxes dictionary
-            key = f'result_{idx}.jpg'
+            key = og_filename
             bbox_array = result.boxes.xyxy.cpu().numpy()
             bbox_array_1d = bbox_array.flatten()
             value = bbox_array_1d
@@ -94,7 +95,8 @@ def index():
                 writer.writeheader()
 
             for idx, result in enumerate(results):
-                image_name = f"result_{idx}.jpg"
+                og_filename = os.path.basename(result.path)
+                image_name = og_filename
                 # Save predicted CR image to output folder
                 result.save(filename=f"C:/EGH400-UI/ui/{output_folder}/{image_name}")
 
