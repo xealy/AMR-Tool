@@ -52,6 +52,7 @@ def index():
         for idx, result in enumerate(results):
             # save predicted RAD image to interim folder
             result.save(filename=f"C:/EGH400-UI/ui/{interim_folder}/result_{idx}.jpg")
+
             # update bounding boxes dictionary
             key = f'result_{idx}.jpg'
             bbox_array = result.boxes.xyxy.cpu().numpy()
@@ -81,11 +82,15 @@ def index():
             image_name = f"result_{idx}.jpg"
             # save predicted CR image to output folder
             result.save(filename=f"C:/EGH400-UI/ui/{output_folder}/{image_name}")
+
             # output AMR readings to text file
             sorted_indices = sorted(range(len(result.boxes.xyxy)), key=lambda i: result.boxes.xyxy[i][0])
             sorted_class_predictions = [result.boxes.cls[i] for i in sorted_indices]
             sorted_class_predictions_list = [int(tensor.item()) for tensor in sorted_class_predictions]
             amr_reading_string = ''.join([str(num) for num in sorted_class_predictions_list])
+            amr_reading_string = amr_reading_string[:5] + '.' + amr_reading_string[5:]
+            amr_reading_string = amr_reading_string + 'kL'
+
             with open(output_text_file, 'a') as file:
                 file.write(f"{image_name}: {amr_reading_string}\n")
 
