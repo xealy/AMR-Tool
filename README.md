@@ -1,6 +1,7 @@
 # AMR-Solution
-![university](https://img.shields.io/badge/university-1E90FF?style=for-the-badge&logo=appveyor)
-![final year](https://img.shields.io/badge/final year-800080?style=for-the-badge&logo=appveyor)
+
+![university project](https://img.shields.io/badge/university%20project-1E90FF)
+![final year](https://img.shields.io/badge/final%20year-8A2BE2)
 
 ## About
 An Automatic Meter Reader (AMR) is a system that automatically reads utility usage. While smart meters are gradually being rolled out, traditional utility meters are still widely used in Australia. Additionally, the manual process of traveling to and recording water meter readings across multiple properties is labor-intensive, making it a good candidate for automation. Since replacing traditional meters with smart meters is both time-consuming and costly, there is a need for an intermediate image-based AMR solution that can be deployed on a mobile device. 
@@ -23,4 +24,4 @@ To run the web application, use a virtual environment to keep package installati
 * flask run
 
 ## Demo Video
-~pending~
+~ pending ~
