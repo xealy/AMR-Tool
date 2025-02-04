@@ -1,4 +1,4 @@
-# AMR Solution
+# AMR Tool
 ## About
 An Automated Meter Reader (AMR) is a system that automatically reads utility usage. While smart meters are gradually being rolled out, traditional utility meters are still widely used in Australia. Additionally, the manual process of traveling to and recording water meter readings across multiple properties is labor-intensive, making it a good candidate for automation. Since replacing traditional meters with smart meters is both time-consuming and costly, there is a need for an intermediate image-based AMR solution that can be deployed on a mobile device. 
 
